@@ -2,17 +2,20 @@
 var myTimeZone = {
 
     position: {},
-
+    paper: null,
 
     initialize: function() {
-        //_.bindAll(this);
+        _.bindAll(this);
         myTimeZone.render();
         myTimeZone.getLocation();
     },
 
     render: function(){
-        var paper = Raphael(10, 50, 320, 200);
-        var c = paper.circle(50, 50, 40);
+        this.paper = Raphael(10, 50, 1024, 768);
+        var c = this.paper.circle(50, 50, 40);
+        var path = this.paper.text(10, 10, "hello");;
+        this.paper.path(path);
+
     },
 
     getLocation: function(){
@@ -21,16 +24,21 @@ var myTimeZone = {
 
     onGPSSuccess: function(position){
         this.position = position;
-        alert('Latitude: '          + position.coords.latitude          + '\n' +
-              'Longitude: '         + position.coords.longitude         + '\n' +
-              'Altitude: '          + position.coords.altitude          + '\n' +
-              'Accuracy: '          + position.coords.accuracy          + '\n' +
-              'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
-              'Heading: '           + position.coords.heading           + '\n' +
-              'Speed: '             + position.coords.speed             + '\n' +
-              'Timestamp: '         + position.timestamp                + '\n');
+        // alert('Latitude: '          + position.coords.latitude          + '\n' +
+        //       'Longitude: '         + position.coords.longitude         + '\n' +
+        //       'Altitude: '          + position.coords.altitude          + '\n' +
+        //       'Accuracy: '          + position.coords.accuracy          + '\n' +
+        //       'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
+        //       'Heading: '           + position.coords.heading           + '\n' +
+        //       'Speed: '             + position.coords.speed             + '\n' +
+        //       'Timestamp: '         + position.timestamp                + '\n');
         var result = SunCalc.getTimes(new Date(),position.coords.latitude, position.coords.longitude);
-        console.log(result);
+        var s="";
+        _.forEach(result, function(d,k){
+            s=s+k+":"+d+"\n";
+
+        });
+        var path = this.paper.text(200, 100, s);
     },
 
     onGPSError: function(error){
