@@ -1,0 +1,56 @@
+2015-04-26 14:16:12.892 MyTimeZone[3269:437774] DiskCookieStorage changing policy from 2 to 0, cookie file: file:///Users/johnfriedman/Library/Developer/CoreSimulator/Devices/C0948363-4303-4EC0-8071-2ED946B40E48/data/Containers/Data/Application/58492373-3F13-4108-A3FD-75824AA6902E/Library/Cookies/Cookies.binarycookies
+2015-04-26 14:16:13.169 MyTimeZone[3269:437774] Apache Cordova native platform version 3.8.0 is starting.
+2015-04-26 14:16:13.170 MyTimeZone[3269:437774] Multi-tasking -> Device: YES, App: YES
+2015-04-26 14:16:13.190 MyTimeZone[3269:437774] Unlimited access to network resources
+2015-04-26 14:16:13.199 MyTimeZone[3269:437774] 
+
+Started backup to iCloud! Please be careful.
+Your application might be rejected by Apple if you store too much data.
+For more information please read "iOS Data Storage Guidelines" at:
+https://developer.apple.com/icloud/documentation/data-storage/
+To disable web storage backup to iCloud, set the BackupWebStorage preference to "local" in the Cordova config.xml file
+
+2015-04-26 14:16:13.928 MyTimeZone[3269:437774] Resetting plugins due to page load.
+2015-04-26 14:16:14.014 MyTimeZone[3269:437774] Finished load of: file:///Users/johnfriedman/Library/Developer/CoreSimulator/Devices/C0948363-4303-4EC0-8071-2ED946B40E48/data/Containers/Bundle/Application/99C71D4E-F185-45C3-B372-1890B305DA01/MyTimeZone.app/www/index.html
+2015-04-26 14:19:16.814 MyTimeZone[3388:440076] DiskCookieStorage changing policy from 2 to 0, cookie file: file:///Users/johnfriedman/Library/Developer/CoreSimulator/Devices/C0948363-4303-4EC0-8071-2ED946B40E48/data/Containers/Data/Application/1885FB4A-33FD-43CF-BEF0-9290B46D4822/Library/Cookies/Cookies.binarycookies
+2015-04-26 14:19:16.904 MyTimeZone[3388:440076] Apache Cordova native platform version 3.8.0 is starting.
+2015-04-26 14:19:16.905 MyTimeZone[3388:440076] Multi-tasking -> Device: YES, App: YES
+2015-04-26 14:19:16.906 MyTimeZone[3388:440076] Unlimited access to network resources
+2015-04-26 14:19:16.908 MyTimeZone[3388:440076] 
+
+Started backup to iCloud! Please be careful.
+Your application might be rejected by Apple if you store too much data.
+For more information please read "iOS Data Storage Guidelines" at:
+https://developer.apple.com/icloud/documentation/data-storage/
+To disable web storage backup to iCloud, set the BackupWebStorage preference to "local" in the Cordova config.xml file
+
+2015-04-26 14:19:17.017 MyTimeZone[3388:440076] Resetting plugins due to page load.
+2015-04-26 14:19:17.057 MyTimeZone[3388:440076] Finished load of: file:///Users/johnfriedman/Library/Developer/CoreSimulator/Devices/C0948363-4303-4EC0-8071-2ED946B40E48/data/Containers/Bundle/Application/0AFC8EED-38E9-4E90-8DBC-3BF0F98A8983/MyTimeZone.app/www/index.html
+2015-04-26 14:20:24.293 MyTimeZone[3445:440900] DiskCookieStorage changing policy from 2 to 0, cookie file: file:///Users/johnfriedman/Library/Developer/CoreSimulator/Devices/C0948363-4303-4EC0-8071-2ED946B40E48/data/Containers/Data/Application/25B429C5-B05E-4889-8AC6-9C44189780BE/Library/Cookies/Cookies.binarycookies
+2015-04-26 14:20:24.372 MyTimeZone[3445:440900] Apache Cordova native platform version 3.8.0 is starting.
+2015-04-26 14:20:24.373 MyTimeZone[3445:440900] Multi-tasking -> Device: YES, App: YES
+2015-04-26 14:20:24.374 MyTimeZone[3445:440900] Unlimited access to network resources
+2015-04-26 14:20:24.376 MyTimeZone[3445:440900] 
+
+Started backup to iCloud! Please be careful.
+Your application might be rejected by Apple if you store too much data.
+For more information please read "iOS Data Storage Guidelines" at:
+https://developer.apple.com/icloud/documentation/data-storage/
+To disable web storage backup to iCloud, set the BackupWebStorage preference to "local" in the Cordova config.xml file
+
+2015-04-26 14:20:24.487 MyTimeZone[3445:440900] Resetting plugins due to page load.
+2015-04-26 14:20:24.526 MyTimeZone[3445:440900] Finished load of: file:///Users/johnfriedman/Library/Developer/CoreSimulator/Devices/C0948363-4303-4EC0-8071-2ED946B40E48/data/Containers/Bundle/Application/D32633E9-E372-4744-B56D-1028B8E7F25E/MyTimeZone.app/www/index.html
+2015-04-26 15:04:32.367 MyTimeZone[3627:460855] DiskCookieStorage changing policy from 2 to 0, cookie file: file:///Users/johnfriedman/Library/Developer/CoreSimulator/Devices/C0948363-4303-4EC0-8071-2ED946B40E48/data/Containers/Data/Application/16C74EB9-4D65-42E8-8D7C-33BC9F535CF1/Library/Cookies/Cookies.binarycookies
+2015-04-26 15:04:32.678 MyTimeZone[3627:460855] Apache Cordova native platform version 3.8.0 is starting.
+2015-04-26 15:04:32.679 MyTimeZone[3627:460855] Multi-tasking -> Device: YES, App: YES
+2015-04-26 15:04:32.700 MyTimeZone[3627:460855] Unlimited access to network resources
+2015-04-26 15:04:32.709 MyTimeZone[3627:460855] 
+
+Started backup to iCloud! Please be careful.
+Your application might be rejected by Apple if you store too much data.
+For more information please read "iOS Data Storage Guidelines" at:
+https://developer.apple.com/icloud/documentation/data-storage/
+To disable web storage backup to iCloud, set the BackupWebStorage preference to "local" in the Cordova config.xml file
+
+2015-04-26 15:04:33.011 MyTimeZone[3627:460855] Resetting plugins due to page load.
+2015-04-26 15:04:33.112 MyTimeZone[3627:460855] Finished load of: file:///Users/johnfriedman/Library/Developer/CoreSimulator/Devices/C0948363-4303-4EC0-8071-2ED946B40E48/data/Containers/Bundle/Application/DC98858B-96BB-46F2-97D2-B586ED36A767/MyTimeZone.app/www/index.html
