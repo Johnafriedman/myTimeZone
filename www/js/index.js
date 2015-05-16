@@ -31,24 +31,38 @@ var myTimeZone = {
 
   onGPSSuccess: function(position){
     this.position = position;
-    this.times = SunCalc.getTimes(new Date(),position.coords.latitude, position.coords.longitude);
-    var t = new Date().getTime() + (new Date().getTimezoneOffset()*60*1000); // UTC time
-    this.offset = position.coords.longitude*(24*60*60*1000/360); // mt = lat* ms per degree
-    this.times.myTime = new Date(t+this.offset);
-
+    this.calculateTimes();
     this.render();
   },
 
   onGPSError: function(error){
     alert('code: '    + error.code    + '\n' +
           'message: ' + error.message + '\n');
+  },
+
+  calculateTimes: function(){
+    this.times = SunCalc.getTimes(new Date(),this.position.coords.latitude, this.position.coords.longitude);
+    this.times.myTime = this.localTime(new Date());
+    console.log("myTime:",this.times.myTime );
+    console.log("solarNoon:",this.times.solarNoon);
+  },
+
+  localTime: function(today){
+    var year = today.getFullYear();
+    var month = today.getMonth();
+    var day = today.getDate();
+    var solarNoon = this.times.solarNoon.valueOf();
+    var localNoon = new Date(year,month,day,12).valueOf();
+    var offset = solarNoon - localNoon;
+    var localZTime = today.valueOf();
+    var localTime = localZTime - offset;
+    var localDate = new Date(localTime);
+    return localDate;
   }
 
 };
 
 document.addEventListener('deviceready', myTimeZone.initialize(), false);
-
-mt = (360/24)*mlat
 
 // determine latitude
 
