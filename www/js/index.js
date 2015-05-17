@@ -9,8 +9,7 @@ var myTimeZone = {
   initialize: function() {
     _.bindAll(this);
     this.paper = Raphael(10, 50, 1024, 768);
-    //myTimeZone.getLocation();
-    this.render();
+    myTimeZone.getLocation();
   },
 
   render: function(){
@@ -22,17 +21,22 @@ var myTimeZone = {
     var c = circleFrom3Points(p0,p1,p2);
     this.paper.circle(c.center.x, c.center.y, c.radius)
 
-    // var s="";
-    // _.forEach(this.times, function(d,k){
-    //     s=s+k+":"+d+"\n";
+    var s="";
+    _.forEach(this.times, function(d,k){
+        s=s+k+":"+d+"\n";
 
-    // });
-    // this.paper.t.xt(200, 100, s);
+    });
+    this.paper.text(200, 100, s);
+
+    var sunrise = SunCalc.getPosition(this.times.sunrise, this.position.coords.latitude, this.position.coords.longitude);
+    var solarNoon = SunCalc.getPosition(this.times.solarNoon, this.position.coords.latitude, this.position.coords.longitude);
+    var sunset = SunCalc.getPosition(this.times.sunset, this.position.coords.latitude, this.position.coords.longitude);
+    console.log(sunrise, solarNoon, sunset);
 
   },
 
   getLocation: function(){
-    this.paper.t.xt(200, 100, "identifying location");
+    this.paper.text(200, 100, "identifying location");
     navigator.geolocation.getCurrentPosition(this.onGPSSuccess, this.onGPSError);
   },
 
