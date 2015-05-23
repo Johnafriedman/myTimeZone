@@ -1,42 +1,86 @@
 
 (function () { 'use strict';
 
-  var position= {},
-  times= {},
-  offset= 0,
-  paper= null,
-  
+  var 
+    position= {},
+    times= {},
+    offset= 0,
+    paper= null,
+    dial={};
+    
   function render (){
-    displayWidth= document.documentElement.clientWidth,
-    displayHeight= document.documentElement.clientHeight,
-    paperSize= Math.min(displayWidth, displayHeight);
-    paper = Raphael(0, 0, paperSize, paperSize);
+    var
+      displayWidth= document.documentElement.clientWidth,
+      displayHeight= document.documentElement.clientHeight,
+      paperSize= Math.min(displayWidth, displayHeight),
+      paper = Raphael(0, 0, paperSize, paperSize),
+      dial = {center: {x: paperSize/2, y: paperSize/2}, radius: paperSize/2};
+
 
     paper.clear();
-    var p0 = {x:50,y:50}, p1 = {x:150, y:50}, p2= {x:100, y:100};
-    paper.circle(p0.x, p0.y, 10);
-    paper.circle(p1.x, p1.y, 10);
-    paper.circle(p2.x, p2.y, 10);
-    var c = circleFrom3Points(p0,p1,p2);
-    paper.circle(c.center.x, c.center.y, c.radius)
 
-    var s="";
-    _.forEach(times, function(d,k){
-        s=s+k+":"+d+"\n";
+    
 
-    });
-    paper.text(200, 100, s);
+    var sunrise = {center: {}};
+    var sunset = {center: {}};
+    var solarNoon = {center: {}};
+    sunrise.angle = SunCalc.getPosition(times.sunrise, position.coords.latitude, position.coords.longitude);
+    sunset.angle = SunCalc.getPosition(times.sunset, position.coords.latitude, position.coords.longitude);
+    solarNoon.angle = SunCalc.getPosition(times.solarNoon, position.coords.latitude, position.coords.longitude);
 
-    var sunrise = SunCalc.getPosition(times.sunrise, position.coords.latitude, position.coords.longitude);
-    var solarNoon = SunCalc.getPosition(times.solarNoon, position.coords.latitude, position.coords.longitude);
-    var sunset = SunCalc.getPosition(times.sunset, position.coords.latitude, position.coords.longitude);
+    // sunrise.center.x = Math.cos(sunrise.angle.azimuth)*dial.radius+dial.center.x;
+    // sunrise.center.y = Math.sin(sunrise.angle.azimuth)*dial.radius+dial.center.y;
+    // sunrise.radius = 40;
+
+    // sunset.center.x = Math.cos(sunset.angle.azimuth)*dial.radius+dial.center.x;
+    // sunset.center.y = Math.sin(sunset.angle.azimuth)*dial.radius+dial.center.y;
+    // sunset.radius = 40;
+
+    // solarNoon.center.x = Math.cos(solarNoon.angle.azimuth)*dial.radius * Math.cos(solarNoon.angle.altitude) +dial.center.x;
+    // solarNoon.center.y = Math.sin(solarNoon.angle.azimuth)*dial.radius+dial.center.y;
+    // solarNoon.radius = 40;
+
+    paper.circle(dial.center.x, dial.center.y, dial.radius);
+    paper.circle(sunrise.center.x, sunrise.center.y, sunrise.radius)
+    paper.circle(sunset.center.x, sunset.center.y, sunset.radius)
+    paper.circle(solarNoon.center.x, solarNoon.center.y, solarNoon.radius)
+
+    var daylight = times.sunset.valueOf() - times.sunrise.valueOf();
+    var sunpos = {center: {}, radius: 40};
+    var sunpos1 = {center: {}, radius: 40};
+    for(var time = times.sunrise.valueOf(); time <= times.sunset.valueOf(); time+= daylight/12){
+
+      sunpos.angle = SunCalc.getPosition(new Date(time), position.coords.latitude, position.coords.longitude);
+
+      sunpos.center.x = Math.cos(sunpos.angle.azimuth) * dial.radius * Math.cos(sunpos.angle.altitude) + dial.center.x;
+      sunpos.center.y = Math.sin(sunpos.angle.azimuth) * dial.radius * Math.cos(sunpos.angle.altitude) + dial.center.y;
+      paper.circle(sunpos.center.x, sunpos.center.y, sunpos.radius)
+
+      sunpos1.center.x = Math.cos(sunpos.angle.azimuth) * dial.radius  + dial.center.x;
+      sunpos1.center.y = Math.sin(sunpos.angle.azimuth) * dial.radius  + dial.center.y;
+      paper.circle(sunpos.center.x, sunpos.center.y, sunpos.radius)
+
+      paper.path("M"+sunpos.center.x+" "+sunpos.center.y+"L"+sunpos1.center.x+" "+sunpos1.center.y);
+
+
+
+      console.log("cos,sin", Math.cos(sunpos.angle.altitude), Math.sin(sunpos.angle.altitude));
+
+    }
+
+
+
+    // var c = circleFrom3Points(p0,p1,p2);
+    // paper.circle(c.center.x, c.center.y, c.radius)
+
     console.log(sunrise, solarNoon, sunset);
 
   };
 
   function getLocation(){
-    paper.text(200, 100, "identifying location");
-    navigator.geolocation.getCurrentPosition(onGPSSuccess, onGPSError);
+    console.log("identifying location");
+    // navigator.geolocation.getCurrentPosition(onGPSSuccess, onGPSError);
+    onGPSSuccess({coords: {latitude: 45.0, longitude: 90.0}});
   };
 
   function onGPSSuccess(GeoPosition){
