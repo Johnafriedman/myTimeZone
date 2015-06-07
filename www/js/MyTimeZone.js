@@ -69,12 +69,14 @@
     }
   }
 
-  function renderRing(srcCircle, width, steps){
+  function renderRing(circle, width, steps){
     var
-      circle = _.clone(srcCircle),
       angleInc = Math.PI*2/steps,
       p0={},
       p1={};
+
+      draw.circle(circle.radius*2).cx(circle.center.x).cy(circle.center.y).stroke({width: 1}).fill("none");
+      draw.circle(((circle.radius-width)*2)).cx(circle.center.x).cy(circle.center.y).stroke({width: 1}).fill("none");
 
     for(var angle = 0; angle < Math.PI*2; angle += angleInc){
       p0.x = Math.cos(angle) * circle.radius + circle.center.x;
