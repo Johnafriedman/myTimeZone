@@ -9,98 +9,94 @@
     displayWidth= document.documentElement.clientWidth,
     displayHeight= document.documentElement.clientHeight,
     drawSize= Math.min(displayWidth, displayHeight),
-    dial = {center: {x: drawSize/2, y: drawSize/2}, radius: drawSize/2};
+    dial = {center: {x: drawSize/2, y: drawSize/2}, radius: drawSize/2},
+    sunrise = {center: {}},
+    sunset = {center: {}},
+    solarNoon = {center: {}},
+    skyBlue = tinycolor("#87CEFA");
+
 
 
   function renderBackground (){
-    var inc = Math.PI/32,
+    var
+      steps = 24,
+      angleInc = 2*Math.PI/steps,
+      timeInc = (1000 * 60 * 60 * 24)/steps,
       r0={}, r1={}, r2={};
 
 
-      for(var angle = 0; angle < Math.PI*2; angle += inc){
-        r0.x = Math.cos(angle) * dial.radius + dial.center.x;
-        r0.y = Math.sin(angle) * dial.radius + dial.center.y;
-        r1.x = Math.cos(angle+inc) * dial.radius + dial.center.x;
-        r1.y = Math.sin(angle+inc) * dial.radius + dial.center.y;
-        r2.x = Math.cos(angle+inc/2) * dial.radius + dial.center.x;
-        r2.y = Math.sin(angle+inc/2) * dial.radius + dial.center.y;
+    var sunrise = SunCalc.getPosition(new Date(times.sunrise), position.coords.latitude, position.coords.longitude);
+    var sunTime = new Date(times.sunrise).valueOf();
+    for(var angle = sunrise.azimuth; angle < sunrise.azimuth+Math.PI*2; angle += angleInc){
+      r0.x = Math.cos(angle) * dial.radius + dial.center.x;
+      r0.y = Math.sin(angle) * dial.radius + dial.center.y;
+      r1.x = Math.cos(angle+angleInc+.02) * dial.radius + dial.center.x;
+      r1.y = Math.sin(angle+angleInc+.02) * dial.radius + dial.center.y;
+      var gangle = angle+angleInc/2;
+      r2.x = Math.cos(gangle) * 2 * dial.radius + dial.center.x ;
+      r2.y = Math.sin(gangle) * 2 * dial.radius + dial.center.y ;
+
+      var sunDate = new Date(sunTime);
+      var sunpos = SunCalc.getPosition(sunDate, position.coords.latitude, position.coords.longitude);
+      sunTime+= timeInc;
+
+      var r = Math.cos(sunpos.altitude);
+      console.log(sunDate, r);
+
+      var darkSkyBlue = tinycolor(skyBlue).toHsv();
+      darkSkyBlue.v =.2;
+      darkSkyBlue = tinycolor(darkSkyBlue);
+      var gradient = draw.gradient('linear', function(stop) {
+        stop.at(0, darkSkyBlue.toHexString());
+        stop.at(.5, skyBlue.toHexString());
+        stop.at(1, darkSkyBlue.toHexString());
+      })
+
+      var x0=r2.x, x1=dial.center.x, y0=r2.y, y1=dial.center.y;
 
 
+      gradient.attr("gradientUnits","userSpaceOnUse");
 
-        var gradient = draw.gradient('linear', function(stop) {
-          stop.at(0, '#000')
-          stop.at(1, '#fff')
-        })
-        var s = ""+dial.center.x+","+dial.center.y+" "+r0.x+","+r0.y +" "+r1.x+","+r1.y ;
-
-        var x0=r2.x, x1=dial.center.x, y0=r2.y, y1=dial.center.y;
+      // translate line along slope
 
 
-        gradient.attr("gradientUnits","userSpaceOnUse");
-        gradient.from(x0,y0).to(x1,y1);
+      gradient.from(x0,y0).to(x1,y1);
 
-        var polygon = draw.polygon(s).fill(gradient);
+      var s = ""+dial.center.x+","+dial.center.y+" "+r0.x+","+r0.y +" "+r1.x+","+r1.y ;
+      var polygon = draw.polygon(s).fill(gradient);
 
 
-      }
     }
+  }
 
-  // function renderBackground (){
-  //   var daylight = times.sunset.valueOf() - times.sunrise.valueOf();
-  //   var timeInc = daylight/;
-  //   var sunpos0 = {center: {}};
-  //   var sunpos1 = {center: {}};
-  //   var radius0 = {center: {}};
-  //   var radius1 = {center: {}};
-  //   for(var time = times.sunrise.valueOf(); time <= times.sunset.valueOf(); time+= timeInc){
+  function renderRing(srcCircle, width, steps){
+    var
+      circle = _.clone(srcCircle),
+      angleInc = Math.PI*2/steps,
+      p0={},
+      p1={};
 
-  //     sunpos0.angle = SunCalc.getPosition(new Date(time), position.coords.latitude, position.coords.longitude);
-  //     sunpos1.angle = SunCalc.getPosition(new Date(time+timeInc), position.coords.latitude, position.coords.longitude);
-  //     // sunpos1.angle.azimuth+=(.2* (sunpos1.angle.azimuth>=0?-1:1));
+    for(var angle = 0; angle < Math.PI*2; angle += angleInc){
+      p0.x = Math.cos(angle) * circle.radius + circle.center.x;
+      p0.y = Math.sin(angle) * circle.radius + circle.center.y;
 
-  //     sunpos0.center.x = Math.cos(sunpos0.angle.azimuth) * dial.radius * Math.cos(sunpos0.angle.altitude) + dial.center.x;
-  //     sunpos0.center.y = Math.sin(sunpos0.angle.azimuth) * dial.radius * Math.cos(sunpos0.angle.altitude) + dial.center.y;
-
-  //     radius0.center.x = Math.cos(sunpos0.angle.azimuth) * dial.radius  + dial.center.x;
-  //     radius0.center.y = Math.sin(sunpos0.angle.azimuth) * dial.radius  + dial.center.y;
-
-  //     radius1.center.x = Math.cos(sunpos1.angle.azimuth) * dial.radius  + dial.center.x;
-  //     radius1.center.y = Math.sin(sunpos1.angle.azimuth) * dial.radius  + dial.center.y;
-
-  //     var path =
-  //     [
-  //       ["M",dial.center.x,dial.center.y],
-  //       ["L", radius0.center.x,radius0.center.y],
-  //       ["L", radius1.center.x,radius1.center.y],
-  //       ["Z"]
-  //     ];
-  //     var
-  //       // color = "hsb(.6, .65, "+(1.25-Math.cos(sunpos0.angle.altitude))+")",
-  //       angle = Raphael.deg(sunpos0.angle.azimuth + (sunpos1.angle.azimuth-sunpos0.angle.azimuth)/2);
-  //       angle = (angle<0?angle+360:angle);
-
-  //       var grad = angle+"-#000-hsb(.6, .65, 1):"+(1-Math.cos(sunpos0.angle.altitude))*100+"-#000";
-
-  //       grad = angle+"-#000-hsb(.6, .65, 1):50-#000";
-  //       console.log("angle", angle, "sunangle", Raphael.deg(sunpos0.angle.azimuth));
-
-  //     draw.path(path).attr({fill:  grad, "stroke": grad, "stroke-width":10});
-  //   }
-  // }
+      p1.x = Math.cos(angle) * (circle.radius-width) + circle.center.x ;
+      p1.y = Math.sin(angle) * (circle.radius-width) + circle.center.y ;
+      draw.line(p0.x, p0.y, p1.x, p1.y).stroke({width: 1});
+    }
+  }
 
   function render (){
 
     draw = SVG('myTimeZone').fixSubPixelOffset().size(drawSize, drawSize);
-
-    renderBackground();
-
-
-    var sunrise = {center: {}};
-    var sunset = {center: {}};
-    var solarNoon = {center: {}};
     sunrise.angle = SunCalc.getPosition(times.sunrise, position.coords.latitude, position.coords.longitude);
     sunset.angle = SunCalc.getPosition(times.sunset, position.coords.latitude, position.coords.longitude);
     solarNoon.angle = SunCalc.getPosition(times.solarNoon, position.coords.latitude, position.coords.longitude);
+
+    renderBackground();
+    renderRing(dial, 20,360);
+    renderRing(dial, dial.radius-40,24);
+
 
     // draw.circle(dial.center.x, dial.center.y, dial.radius);
 
@@ -110,7 +106,8 @@
     var sunpos1 = {center: {}, radius: 40};
     var sunpath = [];
     var action = "M";
-    for(var time = times.sunrise.valueOf(); time <= times.sunset.valueOf(); time+= daylight/12){
+    // for(var time = times.sunrise.valueOf(); time <= times.sunset.valueOf(); time+= daylight/12){
+      for(var hour=0, time = times.sunrise.valueOf(); hour < 24; time+= (60*60*1000), hour++){
 
       sunpos.angle = SunCalc.getPosition(new Date(time), position.coords.latitude, position.coords.longitude);
       moonpos.angle = SunCalc.getMoonPosition(new Date(time), position.coords.latitude, position.coords.longitude);
@@ -129,7 +126,8 @@
 
       sunpos1.center.x = Math.cos(sunpos.angle.azimuth) * dial.radius  + dial.center.x;
       sunpos1.center.y = Math.sin(sunpos.angle.azimuth) * dial.radius  + dial.center.y;
-      draw.circle(sunpos.radius).cx(sunpos.center.x).cy(sunpos.center.y).attr({fill: "rgb(255, 255, 0)"});
+      var sunColor = (sunpos.angle.altitude>0?"rgb(255, 255, 0)": "rgb(0, 0, 64)")
+      draw.circle(sunpos.radius).cx(sunpos.center.x).cy(sunpos.center.y).attr({fill: sunColor});
 
       var path = [["M",dial.center.x,dial.center.y],["L", sunpos.center.x,sunpos.center.y]];
       // draw.path(path);
@@ -153,7 +151,7 @@
   function getLocation(){
     console.log("identifying location");
     // navigator.geolocation.getCurrentPosition(onGPSSuccess, onGPSError);
-    onGPSSuccess({coords: {latitude: 45.0, longitude: 90.0}});
+    onGPSSuccess({coords: {latitude: 21.3114, longitude: 157.7964}});
   };
 
   function onGPSSuccess(GeoPosition){
