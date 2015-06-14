@@ -19,7 +19,7 @@
 
   function renderBackground (){
     var
-      steps = 24,
+      steps = 96,
       angleInc = 2*Math.PI/steps,
       timeInc = (1000 * 60 * 60 * 24)/steps,
       r0={}, r1={}, r2={};
@@ -33,23 +33,39 @@
       r1.x = Math.cos(angle+angleInc+.02) * dial.radius + dial.center.x;
       r1.y = Math.sin(angle+angleInc+.02) * dial.radius + dial.center.y;
       var gangle = angle+angleInc/2;
-      r2.x = Math.cos(gangle) * 2 * dial.radius + dial.center.x ;
-      r2.y = Math.sin(gangle) * 2 * dial.radius + dial.center.y ;
+      r2.x = Math.cos(gangle) * dial.radius + dial.center.x ;
+      r2.y = Math.sin(gangle) * dial.radius + dial.center.y ;
 
       var sunDate = new Date(sunTime);
       var sunpos = SunCalc.getPosition(sunDate, position.coords.latitude, position.coords.longitude);
       sunTime+= timeInc;
 
       var r = Math.cos(sunpos.altitude);
-      console.log(sunDate, r);
 
-      var darkSkyBlue = tinycolor(skyBlue).toHsv();
-      darkSkyBlue.v =.2;
-      darkSkyBlue = tinycolor(darkSkyBlue);
+      var localSkyBlue = tinycolor(skyBlue).toHsv();
+      var v;
+      if(sunpos.altitude>0){
+        v = .3+((1-r)*1.8);
+      }else{
+        v = .28-((1-r)*1.8);
+
+      }
+      v = Math.min(Math.max(v,0),1);
+      localSkyBlue.v = v;
+      localSkyBlue.s = Math.min(1,.5+v);
+
+      var
+        start = tinycolor(localSkyBlue),
+        end = localSkyBlue;
+
+      end.v = .8;
+      end.s = .1;
+      end = tinycolor(end);
+      console.log(r, v);
+
       var gradient = draw.gradient('linear', function(stop) {
-        stop.at(0, darkSkyBlue.toHexString());
-        stop.at(.5, skyBlue.toHexString());
-        stop.at(1, darkSkyBlue.toHexString());
+        stop.at(0, start.toHexString());
+        stop.at(1, end.toHexString());
       })
 
       var x0=r2.x, x1=dial.center.x, y0=r2.y, y1=dial.center.y;
@@ -153,7 +169,7 @@
   function getLocation(){
     console.log("identifying location");
     // navigator.geolocation.getCurrentPosition(onGPSSuccess, onGPSError);
-    onGPSSuccess({coords: {latitude: 21.3114, longitude: 157.7964}});
+    onGPSSuccess({coords: {latitude: 26, longitude: 90}});
   };
 
   function onGPSSuccess(GeoPosition){
