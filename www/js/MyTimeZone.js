@@ -2,6 +2,14 @@
 (function () { 'use strict';
 
   var
+    targetDate = new Date(),
+    moon = {
+      illumination: {},
+      radius: 40,
+      pos : {angle: 0,
+        center: {}}
+    },
+
     position= {},
     times= {},
     offset= 0,
@@ -114,38 +122,55 @@
     renderBackground();
     renderRing(dial, 20,360);
     renderRing(dial, dial.radius-40,24);
+    renderSun();
 
+  }
+
+  function renderSun(){
 
     // draw.circle(dial.center.x, dial.center.y, dial.radius);
 
-    var daylight = times.sunset.valueOf() - times.sunrise.valueOf();
-    var moonpos = {center: {}, radius: 40};
-    var sunpos = {center: {}, radius: 40};
-    var sunpos1 = {center: {}, radius: 40};
-    var sunpath = [];
-    var action = "M";
+    var daylight = times.sunset.valueOf() - times.sunrise.valueOf(),
+      sunpos = {center: {}, radius: 40},
+      sunpos1 = {center: {}, radius: 40},
+      sunpath = [],
+      action = "M";
+
+      SunCalc.getMoonIllumination(targetDate);
     // for(var time = times.sunrise.valueOf(); time <= times.sunset.valueOf(); time+= daylight/12){
       for(var hour=0, time = times.sunrise.valueOf(); hour < 24; time+= (60*60*1000), hour++){
 
       sunpos.angle = SunCalc.getPosition(new Date(time), position.coords.latitude, position.coords.longitude);
-      moonpos.angle = SunCalc.getMoonPosition(new Date(time), position.coords.latitude, position.coords.longitude);
+      moon.pos.angle = SunCalc.getMoonPosition(new Date(time), position.coords.latitude, position.coords.longitude);
 
       sunpos.center.x = Math.cos(sunpos.angle.azimuth) * dial.radius * Math.cos(sunpos.angle.altitude) + dial.center.x;
       sunpos.center.y = Math.sin(sunpos.angle.azimuth) * dial.radius * Math.cos(sunpos.angle.altitude) + dial.center.y;
-      draw.circle(sunpos.radius).cx(sunpos.center.x).cy(sunpos.center.y);
+      // draw.circle(sunpos.radius).cx(sunpos.center.x).cy(sunpos.center.y);
 
-      // moonpos.center.x = Math.cos(moonpos.angle.azimuth) * dial.radius * Math.cos(moonpos.angle.altitude) + dial.center.x;
-      // moonpos.center.y = Math.sin(moonpos.angle.azimuth) * dial.radius * Math.cos(moonpos.angle.altitude) + dial.center.y;
-      // draw.circle(moonpos.center.x, moonpos.center.y, moonpos.radius).attr({fill: "rgb(255, 255, 255)"});
+      moon.pos.center.x = Math.cos(moon.pos.angle.azimuth) * dial.radius * Math.cos(moon.pos.angle.altitude) + dial.center.x;
+      moon.pos.center.y = Math.sin(moon.pos.angle.azimuth) * dial.radius * Math.cos(moon.pos.angle.altitude) + dial.center.y;
 
+      renderMoon();
 
       sunpath.push([action, sunpos.center.x, sunpos.center.y]);
       action = "L";
 
       sunpos1.center.x = Math.cos(sunpos.angle.azimuth) * dial.radius  + dial.center.x;
       sunpos1.center.y = Math.sin(sunpos.angle.azimuth) * dial.radius  + dial.center.y;
-      var sunColor = (sunpos.angle.altitude>0?"rgb(255, 255, 0)": "rgb(0, 0, 64)")
-      draw.circle(sunpos.radius).cx(sunpos.center.x).cy(sunpos.center.y).attr({fill: sunColor});
+      var sunAttr={};
+      if(sunpos.angle.altitude>0){
+        sunAttr={
+          'fill-opacity': 1,
+          fill: "#ffff00"
+        }
+      }else{
+        sunAttr={
+          'fill-opacity': .25,
+          fill: "#000040"
+        }
+      }
+
+      draw.circle(sunpos.radius).cx(sunpos.center.x).cy(sunpos.center.y).attr(sunAttr);
 
       var path = [["M",dial.center.x,dial.center.y],["L", sunpos.center.x,sunpos.center.y]];
       // draw.path(path);
@@ -166,6 +191,37 @@
 
   };
 
+  function renderMoon(){
+    var moonAttr={},
+      foreColor,
+      backColor,
+      opacity;
+
+    if(moon.illumination.fraction<.5){
+      foreColor = "#ffffff";
+      backColor = "#000000";
+    }else{
+      foreColor = "#000000";
+      backColor = "#ffffff";
+    }
+
+    if(moon.pos.angle.altitude>0){
+      opacity= 1;
+    }else{
+      opacity= .25;
+    }
+
+    draw.circle(moon.radius).cx(moon.pos.center.x).cy(moon.pos.center.y).attr({fill: backColor, 'fill-opacity':.25});
+    //draw.ellipse(moon.radius*(1-moon.illumination.fraction*2), moon.radius).cx(moon.pos.center.x).cy(moon.pos.center.y).attr({fill: foreColor, 'fill-opacity':opacity});
+    var arc = new SVG.PathArray([
+      ['M',moon.pos.center.x,moon.pos.center.y-moon.radius/2],
+      ['A',moon.radius/2,moon.radius/2,0,1,0,moon.pos.center.x,moon.pos.center.y+moon.radius/2],
+      ['A',moon.radius/2-moon.radius/2*(moon.illumination.fraction),moon.radius/2,0,0,1,moon.pos.center.x,moon.pos.center.y-moon.radius/2],
+      ['Z']
+    ]);
+    var arc = draw.path(arc).attr({fill:foreColor});
+  }
+
   function getLocation(){
     console.log("identifying location");
     // navigator.geolocation.getCurrentPosition(onGPSSuccess, onGPSError);
@@ -175,6 +231,7 @@
   function onGPSSuccess(GeoPosition){
     position = GeoPosition;
     calculateTimes();
+    moon.illumination = SunCalc.getMoonIllumination(targetDate);
     render();
   };
 
@@ -184,8 +241,8 @@
   };
 
   function calculateTimes(){
-    times = SunCalc.getTimes(new Date(),position.coords.latitude, position.coords.longitude);
-    times.myTime = localTime(new Date());
+    times = SunCalc.getTimes(targetDate,position.coords.latitude, position.coords.longitude);
+    times.myTime = localTime(targetDate);
     console.log("myTime:",times.myTime );
     console.log("solarNoon:",times.solarNoon);
   };
