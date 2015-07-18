@@ -2,7 +2,7 @@
 (function () { 'use strict';
 
   var
-    targetDate = new Date(),
+    targetDate = new Date(2015,11,21),
     moon = {
       illumination: {},
       radius: 40,
@@ -136,7 +136,6 @@
       sunpath = [],
       action = "M";
 
-      SunCalc.getMoonIllumination(targetDate);
     // for(var time = times.sunrise.valueOf(); time <= times.sunset.valueOf(); time+= daylight/12){
       for(var hour=0, time = times.sunrise.valueOf(); hour < 24; time+= (60*60*1000), hour++){
 
@@ -211,15 +210,20 @@
       opacity= .25;
     }
 
-    draw.circle(moon.radius).cx(moon.pos.center.x).cy(moon.pos.center.y).attr({fill: backColor, 'fill-opacity':.25});
+    var group = draw.group();
+    var circle = draw.circle(moon.radius).cx(moon.pos.center.x).cy(moon.pos.center.y).attr({fill: backColor, 'fill-opacity':.25});
+    group.add(circle);
     //draw.ellipse(moon.radius*(1-moon.illumination.fraction*2), moon.radius).cx(moon.pos.center.x).cy(moon.pos.center.y).attr({fill: foreColor, 'fill-opacity':opacity});
-    var arc = new SVG.PathArray([
-      ['M',moon.pos.center.x,moon.pos.center.y-moon.radius/2],
-      ['A',moon.radius/2,moon.radius/2,0,1,0,moon.pos.center.x,moon.pos.center.y+moon.radius/2],
-      ['A',moon.radius/2-moon.radius/2*(moon.illumination.fraction),moon.radius/2,0,0,1,moon.pos.center.x,moon.pos.center.y-moon.radius/2],
+    var mr2 = moon.radius/2,
+      arc = new SVG.PathArray([
+      ['M',moon.pos.center.x,moon.pos.center.y-mr2],
+      ['A',mr2,mr2,0,1,0,moon.pos.center.x,moon.pos.center.y+mr2],
+      ['A',mr2-mr2*(moon.illumination.fraction),mr2,0,0,1,moon.pos.center.x,moon.pos.center.y-mr2],
       ['Z']
     ]);
     var arc = draw.path(arc).attr({fill:foreColor});
+    group.add(arc);
+    group.rotate(moon.illumination.angle *180/Math.PI);
   }
 
   function getLocation(){
