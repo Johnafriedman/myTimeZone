@@ -2,8 +2,8 @@
 (function () { 'use strict';
 
   var
-    targetDate = new Date(2015,11,21),
-
+    targetDate = new Date(2015,6,21),
+    watchGroup = {},
     position= {},
     times= {},
     offset= 0,
@@ -19,12 +19,16 @@
 
 
 
-  function renderBackground (){
+  function renderSky (){
     var
       sun = {pos: {}},
-      steps = 96,
+      sunGroup = draw.group(),
+      hours = 24,
+      stepsPerHour = 4,
+      steps = hours * stepsPerHour,
       angleInc = 2*Math.PI/steps,
-      timeInc = (1000 * 60 * 60 * 24)/steps,
+      msPerHour = 1000 * 60 * 60,
+      timeInc = ( msPerHour * hours)/steps,
       r0={}, r1={}, r2={};
 
 
@@ -43,19 +47,19 @@
       sun.pos = SunCalc.getPosition(sunDate, position.coords.latitude, position.coords.longitude);
       sunTime+= timeInc;
 
-      var r = Math.cos(sun.pos.altitude);
-
       var v,
+        r,
         color = [];
 
       for(var i=0;i<3;i++){
         color[i] = tinycolor(skyBlue).toHsv();
       }
 
-      if(sun.pos.altitude>0){
-        v = .3+((1-r)*1.8);
+      r = Math.cos(sun.pos.altitude);
+      if(sun.pos.altitude>-.1){
+        v = .3+((1-r)*2);
       }else{
-        v = .3-((1-r)*1.8);
+        v = .3-((1-r)*2);
 
       }
       v = Math.min(Math.max(v,0),1);
@@ -87,12 +91,15 @@
 
       var s = ""+dial.center.x+","+dial.center.y+" "+r0.x+","+r0.y +" "+r1.x+","+r1.y ;
       var polygon = draw.polygon(s).fill(gradient);
+      sunGroup.add(polygon);
 
     }
+    return sunGroup;
   }
 
   function renderRing(circle, width, steps){
     var
+      ringGroup = draw.group(),
       angleInc = Math.PI*2/steps,
       p0={},
       p1={};
@@ -106,27 +113,33 @@
 
       p1.x = Math.cos(angle) * (circle.radius-width) + circle.center.x ;
       p1.y = Math.sin(angle) * (circle.radius-width) + circle.center.y ;
-      draw.line(p0.x, p0.y, p1.x, p1.y).stroke({width: 1});
+      var line = draw.line(p0.x, p0.y, p1.x, p1.y).stroke({width: 1});
+      ringGroup.add(line);
     }
+    return ringGroup;
   }
 
   function render (){
 
     draw = SVG('myTimeZone').fixSubPixelOffset().size(drawSize, drawSize);
+    var renderGroup = draw.group();
     sunrise.angle = SunCalc.getPosition(times.sunrise, position.coords.latitude, position.coords.longitude);
     sunset.angle = SunCalc.getPosition(times.sunset, position.coords.latitude, position.coords.longitude);
     solarNoon.angle = SunCalc.getPosition(times.solarNoon, position.coords.latitude, position.coords.longitude);
 
-    renderBackground();
-    renderRing(dial, 20,360);
-    renderRing(dial, dial.radius-40,24);
-    renderDay();
+
+    renderGroup.add(renderSky());
+    renderGroup.add(renderRing(dial, 20,360));
+    renderGroup.add(renderRing(dial, dial.radius-40,24));
+    renderGroup.add(renderDay());
+    renderGroup.rotate(90);
 
   }
 
   function renderDay(){
 
     var
+      dayGroup = draw.group(),
       sun = {
         radius: 40,
         center: {x: 0, y:0},
@@ -153,11 +166,11 @@
       moon.center.x = Math.cos(moon.pos.azimuth) * dial.radius * Math.cos(moon.pos.altitude) + dial.center.x;
       moon.center.y = Math.sin(moon.pos.azimuth) * dial.radius * Math.cos(moon.pos.altitude) + dial.center.y;
 
-      renderMoon(moon);
-      renderSun(sun);
+      dayGroup.add(renderMoon(moon));
+      dayGroup.add(renderSun(sun));
 
     }
-
+    return dayGroup;
   };
 
   function renderMoon(moon){
@@ -194,6 +207,7 @@
     var arc = draw.path(arc).attr({fill:foreColor});
     group.add(arc);
     group.rotate(moon.illumination.angle *180/Math.PI);
+    return group;
   };
 
   function renderSun(sun){
@@ -210,14 +224,14 @@
       }
     }
 
-    draw.circle(sun.radius).cx(sun.center.x).cy(sun.center.y).attr(sunAttr);
+    return draw.circle(sun.radius).cx(sun.center.x).cy(sun.center.y).attr(sunAttr);
 
   };
 
   function getLocation(){
     console.log("identifying location");
     // navigator.geolocation.getCurrentPosition(onGPSSuccess, onGPSError);
-    onGPSSuccess({coords: {latitude: 26, longitude: 90}});
+    onGPSSuccess({coords: {latitude: 42, longitude: 87}});
   };
 
   function onGPSSuccess(GeoPosition){
